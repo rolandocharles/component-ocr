@@ -33,13 +33,7 @@ def main():
 
             if result and len(result) > 0:
                 page_data = result[0]
-                
-                extracted_text = []
-                if isinstance(page_data, dict) and 'rec_texts' in page_data:
-                    extracted_text = page_data['rec_texts']
-                elif hasattr(page_data, 'rec_texts'):
-                    extracted_text = page_data.rec_texts
-                
+                extracted_text = page_data['rec_texts']
                 print(f"Raw OCR Text: {extracted_text}")
                 
                 possible_parts = utils.filter_ocr(extracted_text)
@@ -92,7 +86,6 @@ def main():
                                 
                                 choice_idx = int(choice) - 1
                                 if 0 <= choice_idx < len(valid_matches):
-                                    print(f"DEBUG: You selected option {choice}.")
                                     selected_match = valid_matches[choice_idx][1]
                                     print(f"Selected: {selected_match.get('MouserPartNumber')}")
                                     
