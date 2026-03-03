@@ -8,9 +8,8 @@ def main():
     cfg = AppConfig()
     
     ocr = PaddleOCR(use_textline_orientation=True, lang='en')
+
     cap = cv2.VideoCapture(cfg.camera_index) 
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 1920)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 1080)
 
     if not cap.isOpened():
         print(f"Error: Could not open camera {cfg.camera_index}. Check your .env file or USB connection.")
