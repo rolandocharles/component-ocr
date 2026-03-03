@@ -28,8 +28,8 @@ def main():
         
         if key == ord(' '):
             print("Processing OCR...")
-            result = ocr.predict(frame)
-            
+            result = list(ocr.predict(frame))
+            print(f"OCR Result: {result}")
             if result and result[0]:
                 extracted_text = [line[1][0] for line in result[0]]
                 part_number = extracted_text[0]
