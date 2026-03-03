@@ -1,5 +1,23 @@
 import requests
 import re
+import json
+
+def print_full_search_output(part_data):
+    """
+    Prints the full JSON dictionary for the selected Mouser part.
+    """
+    print("\n" + "="*55)
+    print(f" DEBUG: FULL DATA FOR {part_data.get('MouserPartNumber', 'SELECTED PART')}")
+    print("="*55)
+    
+    try:
+        # Pretty-print the dictionary
+        print(json.dumps(part_data, indent=4))
+    except Exception as e:
+        print(f"Could not format part data: {e}")
+        print(part_data)
+        
+    print("="*55 + "\n")
 
 def filter_ocr(ocr_texts: list) -> list:
     """

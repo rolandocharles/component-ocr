@@ -67,6 +67,7 @@ def main():
                         selected_match = valid_matches[0][1]
                         print(f"\nExact Match Found: {selected_match.get('Description')}")
                         
+                        utils.print_full_search_output(selected_match)
                         # status = utils.update_snipeit(cfg, selected_match)
                         # print(f"Snipe-IT Sync Status: {status}")
                     
@@ -89,6 +90,7 @@ def main():
                                     selected_match = valid_matches[choice_idx][1]
                                     print(f"Selected: {selected_match.get('MouserPartNumber')}")
                                     
+                                    utils.print_full_search_output(selected_match)
                                     # status = utils.update_snipeit(cfg, selected_match)
                                     # print(f"Snipe-IT Sync Status: {status}")
                                     break
