@@ -30,33 +30,87 @@ def main():
             print("Processing OCR...")
             result = list(ocr.predict(frame))
             print(f"OCR Result: {result}")
-            if result and result[0]:
-                extracted_text = [line[1][0] for line in result[0]]
-                part_number = extracted_text[0]
-                print(f"Searching Mouser for: {part_number}")
+
+            if result and len(result) > 0:
+                page_data = result[0]
                 
-                request = MouserPartSearchRequest('partnumber')
+                extracted_text = []
+                if isinstance(page_data, dict) and 'rec_texts' in page_data:
+                    extracted_text = page_data['rec_texts']
+                elif hasattr(page_data, 'rec_texts'):
+                    extracted_text = page_data.rec_texts
                 
-                success = request.part_search(part_number)
+                print(f"Raw OCR Text: {extracted_text}")
                 
-                if success:
-                    cleaned_data = request.get_clean_response()
-                    
-                    if cleaned_data and len(cleaned_data) > 0:
-                        best_match = cleaned_data[0]
-                        print(f"Found: {best_match.get('Description')}")
+                possible_parts = utils.filter_ocr(extracted_text)
+                print(f"Filtered Candidates: {possible_parts}")
+                
+                valid_matches = []
+                seen_mouser_numbers = set()
+
+                if possible_parts:
+                    for part_number in possible_parts:                    
+                        print(f"Searching Mouser for: {part_number}")
                         
-                        # Sync with Snipe-IT
-                        status = utils.update_snipeit(cfg, best_match)
-                        print(f"Snipe-IT Sync Status: {status}")
+                        request = MouserPartSearchRequest('partnumber')
+                        success = request.part_search(part_number)
+                        
+                        if success:
+                            cleaned_data = request.get_clean_response()
+                            
+                            if cleaned_data and len(cleaned_data) > 0:
+                                best_match = cleaned_data[0]
+                                mouser_pn = best_match.get('MouserPartNumber')
+                                
+                                if mouser_pn and mouser_pn not in seen_mouser_numbers:
+                                    seen_mouser_numbers.add(mouser_pn)
+                                    valid_matches.append((part_number, best_match))
+
+                    if not valid_matches:
+                        print("No matching part data found on Mouser for any candidates.")
+                    
+                    elif len(valid_matches) == 1:
+                        selected_match = valid_matches[0][1]
+                        print(f"\nExact Match Found: {selected_match.get('Description')}")
+                        
+                        # status = utils.update_snipeit(cfg, selected_match)
+                        # print(f"Snipe-IT Sync Status: {status}")
+                    
                     else:
-                        print("Mouser returned a success code, but no matching part data was found.")
+                        print("\nMultiple parts found. Please select the correct one:")
+                        for idx, (scanned_code, match) in enumerate(valid_matches):
+                            desc = match.get('Description', 'No Description')
+                            m_pn = match.get('MouserPartNumber', 'Unknown PN')
+                            print(f"  [{idx + 1}] {m_pn} (from '{scanned_code}') - {desc}")
+                        
+                        while True:
+                            try:
+                                choice = input(f"Enter choice (1-{len(valid_matches)}) or 'c' to cancel: ")
+                                if choice.lower() == 'c':
+                                    print("Selection cancelled.")
+                                    break
+                                
+                                choice_idx = int(choice) - 1
+                                if 0 <= choice_idx < len(valid_matches):
+                                    print(f"DEBUG: You selected option {choice}.")
+                                    selected_match = valid_matches[choice_idx][1]
+                                    print(f"Selected: {selected_match.get('MouserPartNumber')}")
+                                    
+                                    # status = utils.update_snipeit(cfg, selected_match)
+                                    # print(f"Snipe-IT Sync Status: {status}")
+                                    break
+                                else:
+                                    print("Invalid selection. Out of range.")
+                            except ValueError:
+                                print("Invalid input. Please enter a number.")
                 else:
-                    print("Mouser API request failed. Check API key, connection, or part number validity.")
+                    print("OCR found text, but no valid part numbers passed the filter.")
+            else:
+                print("No text detected. Adjust focus or lighting.")
 
         elif key == ord('q'):
             break
-
+        
     cap.release()
     cv2.destroyAllWindows()
 
