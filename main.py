@@ -4,6 +4,12 @@ import utils
 from config import AppConfig
 from mouser.api import MouserPartSearchRequest 
 
+# TODO: Add logging instead of print statements
+# TODO: Add classes for consumable types
+# TODO: Add multiple search strategies
+# TODO: Add multiple API support
+# TODO: Ensure asset tags uniqueness by checking against Snipe-IT before assigning
+
 def main():
     cfg = AppConfig()
     
@@ -15,9 +21,10 @@ def main():
         print(f"Error: Could not open camera {cfg.camera_index}. Check your .env file or USB connection.")
         return
     
+    print("System Ready. [SPACE] to Capture, [Q] to Quit.")
+
     while True:
-        print("System Ready. [SPACE] to Capture, [Q] to Quit.")
-        
+
         ret, frame = cap.read()
         if not ret:
             print("Failed to grab frame.")
@@ -70,6 +77,7 @@ def main():
                         utils.print_full_search_output(selected_match)
                         status = utils.update_snipeit(cfg, selected_match)
                         print(f"Snipe-IT Sync Status: {status}")
+                        print("System Ready. [SPACE] to Capture, [Q] to Quit.")
                     
                     else:
                         print("\nMultiple parts found. Please select the correct one:")
@@ -93,6 +101,7 @@ def main():
                                     utils.print_full_search_output(selected_match)
                                     status = utils.update_snipeit(cfg, selected_match)
                                     print(f"Snipe-IT Sync Status: {status}")
+                                    print("System Ready. [SPACE] to Capture, [Q] to Quit.")
                                     break
                                 else:
                                     print("Invalid selection. Out of range.")
