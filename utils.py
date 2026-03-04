@@ -1,6 +1,7 @@
 import requests
 import re
 import json
+import random
 
 def print_full_search_output(part_data):
     """
@@ -93,26 +94,50 @@ def filter_ocr(ocr_texts: list) -> list:
                     
     return candidates
 
+def generate_random_asset_model_id():
+    """
+    Placeholder function to generate a random asset model ID.
+    Replace with your actual logic if needed.
+    """
+    return random.randint(100, 999)
+
 def update_snipeit(cfg, part_data):
-    """Creates a component in Snipe-IT using the provided config object."""
+    """
+    Creates a new hardware Asset in Snipe-IT using the Mouser part data
+    and maps them to the 'Electronic Components' custom fieldset.
+    """
     headers = {
         "Authorization": f"Bearer {cfg.snipe_token}",
         "Accept": "application/json",
         "Content-Type": "application/json"
     }
-    
+
+    # Base payload for a Snipe-IT Asset
     payload = {
-        "name": part_data.get('ManufacturerPartNumber', 'Unknown Part'),
-        "category_id": cfg.category_id,
-        "qty": 1,
-        "location_id": cfg.location_id,
-        "manufacturer_id": cfg.manufacturer_id,
-        "notes": f"Auto-added from Mouser. Desc: {part_data.get('Description')}"
+        "name": part_data.get("ManufacturerPartNumber", "Unknown Part"), 
+        "model_id": generate_random_asset_model_id(),
+        "status_id": cfg.ready_to_deploy_status_id,
+        
+        "_snipeit_manufacturer_product_number_8": part_data.get("ManufacturerPartNumber", ""),
+        "_snipeit_component_category_9": part_data.get("Category", ""),
+        "_snipeit_description_10": part_data.get("Description", ""),
+        "_snipeit_datasheet_11": part_data.get("DataSheetUrl", ""),
+        "_snipeit_manufacturer_12": part_data.get("Manufacturer", ""),
+        "_snipeit_url_13": part_data.get("ProductDetailUrl", "")
     }
-    
+
     try:
-        response = requests.post(f"{cfg.snipe_url}/components", headers=headers, json=payload)
-        return response.status_code
+        url = f"{cfg.snipe_url}/hardware"
+        response = requests.post(url, headers=headers, json=payload)
+        response_data = response.json()
+        
+        if response.status_code == 200 and response_data.get("status") == "success":
+            print(f"Successfully created Asset! Tag: {response_data['payload']['asset_tag']}")
+            return True
+        else:
+            print(f"Snipe-IT API Validation Error: {response_data.get('messages')}")
+            return False
+            
     except Exception as e:
-        print(f"Snipe-IT API Error: {e}")
-        return None
+        print(f"Snipe-IT Request Error: {e}")
+        return False

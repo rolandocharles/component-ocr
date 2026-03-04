@@ -68,8 +68,8 @@ def main():
                         print(f"\nExact Match Found: {selected_match.get('Description')}")
                         
                         utils.print_full_search_output(selected_match)
-                        # status = utils.update_snipeit(cfg, selected_match)
-                        # print(f"Snipe-IT Sync Status: {status}")
+                        status = utils.update_snipeit(cfg, selected_match)
+                        print(f"Snipe-IT Sync Status: {status}")
                     
                     else:
                         print("\nMultiple parts found. Please select the correct one:")
@@ -91,8 +91,8 @@ def main():
                                     print(f"Selected: {selected_match.get('MouserPartNumber')}")
                                     
                                     utils.print_full_search_output(selected_match)
-                                    # status = utils.update_snipeit(cfg, selected_match)
-                                    # print(f"Snipe-IT Sync Status: {status}")
+                                    status = utils.update_snipeit(cfg, selected_match)
+                                    print(f"Snipe-IT Sync Status: {status}")
                                     break
                                 else:
                                     print("Invalid selection. Out of range.")
