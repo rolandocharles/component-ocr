@@ -15,9 +15,9 @@ def main():
         print(f"Error: Could not open camera {cfg.camera_index}. Check your .env file or USB connection.")
         return
     
-    print("System Ready. [SPACE] to Capture, [Q] to Quit.")
-
     while True:
+        print("System Ready. [SPACE] to Capture, [Q] to Quit.")
+        
         ret, frame = cap.read()
         if not ret:
             print("Failed to grab frame.")

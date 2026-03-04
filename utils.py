@@ -94,12 +94,14 @@ def filter_ocr(ocr_texts: list) -> list:
                     
     return candidates
 
-def generate_random_asset_model_id():
+def generate_random_asset_tag():
     """
-    Placeholder function to generate a random asset model ID.
+    Placeholder function to generate a random asset tag.
     Replace with your actual logic if needed.
     """
-    return random.randint(100, 999)
+    asset_tag = random.randint(10000, 99999)
+    print(f"Generated Asset Tag: {asset_tag}")
+    return asset_tag
 
 def update_snipeit(cfg, part_data):
     """
@@ -115,8 +117,9 @@ def update_snipeit(cfg, part_data):
     # Base payload for a Snipe-IT Asset
     payload = {
         "name": part_data.get("ManufacturerPartNumber", "Unknown Part"), 
-        "model_id": generate_random_asset_model_id(),
-        "status_id": cfg.ready_to_deploy_status_id,
+        "model_id": 2,  # Assuming 'Electronic Components' model has ID 2
+        "asset_tag": generate_random_asset_tag(),
+        "status_id": 2,  # Assuming 'Ready To Deploy' status has ID 2
         
         "_snipeit_manufacturer_product_number_8": part_data.get("ManufacturerPartNumber", ""),
         "_snipeit_component_category_9": part_data.get("Category", ""),

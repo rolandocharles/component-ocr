@@ -15,8 +15,7 @@ class AppConfig:
     category_id: int = int(os.getenv("DEFAULT_CATEGORY_ID", 1))
     location_id: int = int(os.getenv("DEFAULT_LOCATION_ID", 1))
     manufacturer_id: int = int(os.getenv("DEFAULT_MANUFACTURER_ID", 1))
-    ready_to_deploy_status_id: str = str(os.getenv("READY_TO_DEPLOY_STATUS_ID", "Ready To Deploy"))
-    
+        
     # hardware settings
     # Defaulting to 1 for the USB webcam, but allowing override via .env
     camera_index: int = int(os.getenv("CAMERA_INDEX", 0))
